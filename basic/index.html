@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peer Video Call</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="main-container">
+      <!-- User-A -->
+      <section class="left-container">
+        <h1>User-A</h1>
+
+        <!-- Step - 1 -->
+        <button class="btn">WebRTC Init</button>
+        <hr />
+
+        <!-- Step - 2 -->
+        <button class="btn">Create Offer</button>
+        <div class="offer-box" style="margin-bottom: 1.2rem">
+          <div class="copy-text"><span>Copy</span></div>
+          <div>SDP offer will appear here...</div>
+        </div>
+        <hr />
+
+        <!-- Step - 6 -->
+        <label>Paste User-B answer here</label>
+        <textarea class="offer-input"></textarea>
+        <div class="save-container"><button class="btn btn-save">Save</button></div>
+        <hr />
+      </section>
+
+      <!-- User-B -->
+      <section class="right-container">
+        <h1>User-B</h1>
+
+        <!-- Step - 3 -->
+        <button class="btn">WebRTC Init</button>
+        <hr />
+
+        <!-- Step - 4 -->
+        <label>Paste User-A offer here</label>
+        <textarea class="offer-input"></textarea>
+        <div class="save-container"><button class="btn btn-save">Save</button></div>
+        <hr />
+
+        <!-- Step - 5 -->
+        <button class="btn">Create Answer</button>
+        <div class="offer-box" style="margin-bottom: 1.2rem">
+          <div class="copy-text"><span>Copy</span></div>
+          <div>SDP answer will appear here...</div>
+        </div>
+
+        <hr />
+      </section>
+    </main>
+  </body>
+</html>
