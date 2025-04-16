@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peer Video Call</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="main-container">
+      <section class="inner-container">
+        <h1>My Peer Audio/Video Call</h1>
+
+        <label for="userType">Select user type</label>
+        <select name="userType" id="user-type" class="usertype-select">
+          <option value="offerer">Offerer</option>
+          <option value="answerer">Answerer</option>
+        </select>
+
+        <fieldset>
+          <legend>Create Offer/Answer</legend>
+
+          <div id="create-offer-container">
+            <button id="create-offer-btn" class="btn" onclick="createOffer()">Create Offer</button>
+            <div class="offer-box" style="margin-bottom: 1.2rem">
+              <button onclick="copyText('sdp-offer')" class="copy-text-btn">Copy</button>
+              <div id="sdp-offer">SDP offer will appear here...</div>
+            </div>
+          </div>
+
+          <div id="create-ans-container">
+            <button id="create-ans-btn" class="btn" onclick="createAnswer()">Create Answer</button>
+            <div class="offer-box" style="margin-bottom: 1.2rem">
+              <button onclick="copyText('sdp-answer')" class="copy-text-btn">Copy</button>
+              <div id="sdp-answer">SDP answer will appear here...</div>
+            </div>
+          </div>
+        </fieldset>
+        <!-- <hr /> -->
+
+        <fieldset>
+          <legend>Accept Offer/Answer</legend>
+
+          <div id="accept-offer-container" class="inner-container">
+            <label>Paste Remote user's <strong>SDP offer</strong> here</label>
+            <textarea id="remote-sdp-offer" class="offer-input"></textarea>
+            <button class="btn" style="margin-top: 0.5rem" onclick="acceptOffer()">Accept offer</button>
+          </div>
+
+          <div id="accept-ans-container" class="inner-container">
+            <label>Paste Remote user's <strong>SDP answer</strong> here</label>
+            <textarea id="remote-sdp-answer" class="offer-input"></textarea>
+            <button class="btn" style="margin-top: 0.5rem" onclick="acceptAnswer()">Accept answer</button>
+          </div>
+        </fieldset>
+
+        <hr />
+      </section>
+
+      <section class="inner-container" style="margin-top: 2rem">
+        <div class="video-container">
+          <div>
+            <label for="local-video">Local Video</label>
+            <video class="video-element" id="local-video" autoplay muted></video>
+          </div>
+
+          <div>
+            <label for="remote-video">Remote Video</label>
+            <video class="video-element" id="remote-video" autoplay></video>
+          </div>
+        </div>
+
+        <!-- <div class="btn-container">
+          <button class="btn btn-call">Call</button>
+          <button class="btn btn-hangup">Hang Up</button>
+        </div> -->
+      </section>
+    </main>
+
+    <script src="client.js"></script>
+  </body>
+</html>
