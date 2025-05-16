@@ -53,27 +53,97 @@ peerConnection.addEventListener('connectionstatechange', async (event) => {
   if (peerConnection.connectionState === 'connected') {
     // Peers connected!
     console.log('Peers connected!');
-    alert('Peers connected!');
+    await fetch('/iceCandidates', {
+      method: 'DELETE'
+    });
   }
 });
 
 peerConnection.onicecandidate = (event) => {
-  if (event.candidate) {
+  if (event.candidate && event.candidate.candidate) {
     console.log('ICE Candidate:', event.candidate);
-    if (event.candidate) {
-      peerConnection.addIceCandidate(event.candidate);
-    }
+
+    // Send the candidate to the remote peer using fetch on /iceCandidate1 or /iceCandidate2
+    const path = localStorage.getItem('userType') === 'offerer' ? '/iceCandidate1' : '/iceCandidate2';
+
+    fetch(path, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(event.candidate)
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log('ICE candidate sent successfully');
+        } else {
+          console.error('Error sending ICE candidate:', response.statusText);
+        }
+      })
+      .catch((error) => {
+        console.error('Error sending ICE candidate:', error);
+      });
   }
 };
+
+function addRemoteIceCandidate() {
+  const isOfferer = localStorage.getItem('userType') === 'offerer';
+  const path = isOfferer ? '/iceCandidate2' : '/iceCandidate1';
+
+  if (!peerConnection.remoteDescription) return;
+
+  fetch(path)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log('Received remote ICE candidate:', data);
+
+      if (!data) return;
+
+      const candidate = new RTCIceCandidate(data);
+      console.log('Parsed remote ICE candidate:', candidate);
+
+      // Add the remote ICE candidate to the peer connection
+      peerConnection
+        .addIceCandidate(candidate)
+        .then(() => {
+          console.log('Remote ICE candidate added:', candidate);
+          clearInterval(iceInterval); // Stop fetching after adding the candidate
+        })
+        .catch((error) => {
+          console.error('Error adding remote ICE candidate:', error);
+        });
+    })
+    .catch((error) => {
+      console.error('Error fetching remote ICE candidate:', error);
+    });
+}
+
+let iceInterval;
+
+function startIceInterval() {
+  iceInterval = setInterval(() => {
+    console.log('Fetching remote ICE candidate...');
+
+    addRemoteIceCandidate();
+  }, 15000);
+}
+
+startIceInterval();
 
 async function addMedia() {
   // Listen for track events to get the remote stream
   // and set the remote video element's srcObject to the stream
   peerConnection.addEventListener('track', async (event) => {
     console.log('Track event:', event);
+    console.log('Remote stream:', event.streams[0]);
 
-    const remoteStream = event.streams[0];
-    remoteVideoElm.srcObject = remoteStream;
+    remoteVideoElm.srcObject = event.streams[0];
+    console.log('remoteVideoElm.srcObject:', remoteVideoElm.srcObject);
   });
 
   // Add local video stream to the peer connection
@@ -102,7 +172,7 @@ async function createOffer() {
 
 async function createAnswer() {
   createOfferBtn.disabled = true;
-  await addMedia();
+  // await addMedia(); // This was not setting the remote stream listener on the answerer side
 
   peerConnection
     .createAnswer()
@@ -111,6 +181,7 @@ async function createAnswer() {
     })
     .then(() => {
       sdpAnswerElm.textContent = JSON.stringify(peerConnection.localDescription);
+      isAnswerCreated = true;
     })
     .catch((error) => {
       console.error('Error creating answer:', error);
@@ -118,6 +189,7 @@ async function createAnswer() {
 }
 
 async function acceptOffer() {
+  await addMedia();
   createOfferBtn.disabled = true;
   const offer = JSON.parse(remoteSdpOfferElm.value);
   const offerSdp = {
@@ -159,10 +231,12 @@ function copyText(id) {
   const text = element.textContent || element.innerText;
 
   navigator.clipboard.writeText(text);
+  alert(`Copied`);
 }
 
 async function startLocalVideo() {
   const streams = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  console.log('Local stream:', streams);
 
   localVideoElm.srcObject = streams;
 
